@@ -4,5 +4,5 @@ This script allows you to access and interact with the students of **Villains Ac
 
 ## Instructions
 
-* shell
-* ruby directory.rb
+* ```shell 
+ruby directory.rb```
