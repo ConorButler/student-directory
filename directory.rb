@@ -10,6 +10,30 @@ months = ["January", "February", "March", "April", "May", "June",
 {:field => :height, :prompt => "Enter their height in cm e.g. 160cm", :requirement => /^\d+cm$/}
 ]
 
+def add_students(data)
+  name, cohort, country, height = data
+  @students << {name: name, cohort: cohort, country: country, height: height}
+end
+
+def try_load_students
+  ARGV.first.nil? ? filename = "students.csv" : filename = ARGV.first
+  if File.exists?(filename) # if a file with this name exists
+    load_students(filename) # load this file (and convert to hashes stored in @students)
+    puts "Loaded #{@students.count} from #{filename}"
+  else # if it doesn't exist
+    puts "Sorry, #{filename} doesn't exist."
+    exit
+  end
+end
+
+def load_students(filename = "students.csv") # default filename if no argument supplied
+  file = File.open(filename, "r")
+  file.readlines.each do |line|
+    add_students(line.chomp.split(','))
+  end
+  file.close
+end
+
 def input_students
   data = []
   @input.each do |field|
@@ -24,37 +48,12 @@ def input_students
   add_students(data)
 end
 
-def add_students(data)
-  name, cohort, country, height = data
-  @students << {name: name, cohort: cohort, country: country, height: height}
-end
-
 def save_students
   file = File.open("students.csv", "w")
   @students.each do |student|
     student_data = [student[:name], student[:cohort], student[:country], student[:height]]
     csv_line = student_data.join(",")
     file.puts csv_line
-  end
-  file.close
-end
-
-def try_load_students
-  filename = ARGV.first # first argument from the command line#
-  return if filename.nil? # get of the method if this argument isn't given
-  if File.exists?(filename) # if a file with this name exists
-    load_students(filename) # load this file (and convert to hashes stored in @students)
-    puts "Loaded #{@students.count} from #{filename}"
-  else # if it doesn't exist
-    puts "Sorry, #{filename} doesn't exist."
-    exit
-  end
-end
-  
-def load_students(filename = "students.csv") # default filename if no argument supplied
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    add_students(line.chomp.split(','))
   end
   file.close
 end
@@ -89,14 +88,6 @@ def print_footer
   end
 end
 
-def print_menu
-  puts "1. Input the students"
-  puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
-  puts "9. Exit"  
-end
-
 def show_students
   puts "Enter the cohort you wish to print. Type enter to print all cohorts"
   cohort = STDIN.gets.strip.capitalize
@@ -106,6 +97,14 @@ def show_students
   print_header
   print_students_list(selected_cohort, letter) if !@students.empty?
   print_footer
+end
+
+def print_menu
+  puts "1. Input the students"
+  puts "2. Show the students"
+  puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
+  puts "9. Exit"  
 end
 
 def process(selection)
