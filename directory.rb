@@ -1,3 +1,4 @@
+require 'csv'
 @students = []
 months = ["January", "February", "March", "April", "May", "June",
 "July", "August", "September", "October", "November", "December"]
@@ -46,6 +47,17 @@ def load_students(filename = "students.csv") # default filename if no argument s
   end
 end
 
+def save_students
+  puts "Enter a name for your file"
+  File.open(valid_filename, "w") do |file|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort], student[:country], student[:height]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
+  end
+end
+
 def input_students
   data = []
   @input.each do |field|
@@ -58,17 +70,6 @@ def input_students
     data << user_input
   end
   add_students(data)
-end
-
-def save_students
-  puts "Enter a name for your file"
-  File.open(valid_filename, "w") do |file|
-    @students.each do |student|
-      student_data = [student[:name], student[:cohort], student[:country], student[:height]]
-      csv_line = student_data.join(",")
-      file.puts csv_line
-    end
-  end
 end
 
 def print_header
