@@ -4,30 +4,30 @@ def input_students
   i = 0
   while i >= 0
     puts "Please enter the name of the student. Enter 'stop' to stop entering students"
-    name = gets.strip
+    name = STDIN.gets.strip
     if name == "stop"
       break
     end
     @students << {name: name.capitalize} # << means .push/.append
     puts "Enter their cohort"
-    cohort = gets.strip
+    cohort = STDIN.gets.strip
     until !cohort.empty?
       puts "Please enter something"
-      cohort = gets.strip
+      cohort = STDIN.gets.strip
     end
     @students[i][:cohort] = cohort.capitalize # standardising the input
     puts "Enter the country they are from"
-    country = gets.strip
+    country = STDIN.gets.strip
     until !country.empty?
       puts "Please enter something"
-      country = gets.strip
+      country = STDIN.gets.strip
     end
     @students[i][:country] = country.capitalize
     puts "Enter their height in cm"
-    height = gets.strip
+    height = STDIN.gets.strip
     until height.match(/^\d+$/) # making sure they only enter digits
       puts "Please enter a number"
-      height = gets.strip
+      height = STDIN.gets.strip
     end
     @students[i][:height] = "#{height} cm"
     puts "Now we have #{@students.count} students"
@@ -46,8 +46,20 @@ def save_students
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
+def try_load_students
+  filename = ARGV.first # first argument from the command line#
+  return if filename.nil? # get of the method if this argument isn't given
+  if File.exists?(filename) # if a file with this name exists
+    load_students(filename) # load this file (and convert to hashes stored in @students)
+    puts "Loaded #{@students.count} from #{filename}"
+  else # if it doesn't exist
+    puts "Sorry, #{filename} doesn't exist."
+    exit
+  end
+end
+  
+def load_students(filename = "students.csv") # default filename if no argument supplied
+  file = File.open(filename, "r")
   file.readlines.each do |line|
   name, cohort, country, height = line.chomp.split(',')
     @students << {name: name, cohort: cohort, country: country, height: height}
@@ -67,10 +79,10 @@ def print_students_list
     return nil
   else
     puts "Enter the cohort you wish to print. Type enter to print all cohorts"
-    cohort = gets.strip.capitalize
+    cohort = STDIN.gets.strip.capitalize
     selected_cohort = @students.select{|student| student if student[:cohort] == cohort || cohort.empty?}
     puts "Print names beginning with which letter? Type enter to print all names"
-    letter = gets.strip.upcase
+    letter = STDIN.gets.strip.upcase
     print_header  # moved inside the print so it formats correctly
     until index == selected_cohort.length do
       if (selected_cohort[index][:name][0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
@@ -129,9 +141,10 @@ end
 def interactive_menu
   loop do
     print_menu
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
 # calling the menu
+try_load_students
 interactive_menu
