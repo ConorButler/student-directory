@@ -30,7 +30,6 @@ end
 
 def try_load_students(filename)
   if File.exists?(filename) # if a file with this name exists
-    @students = []  # deletes the current students
     load_students(filename) # load this file (and convert to hashes stored in @students)
     puts "Loaded #{@students.count} from #{filename}"
   else # if it doesn't exist
@@ -40,20 +39,16 @@ def try_load_students(filename)
 end
 
 def load_students(filename = "students.csv") # default filename if no argument supplied
-  File.open(filename, "r") do |file|
-    file.readlines.each do |line|
-      add_students(line.chomp.split(','))
-    end
+  CSV.foreach(filename) do |row|
+    add_students(row)
   end
 end
 
 def save_students
   puts "Enter a name for your file"
-  File.open(valid_filename, "w") do |file|
+  CSV.open(valid_filename, "wb") do |file|
     @students.each do |student|
-      student_data = [student[:name], student[:cohort], student[:country], student[:height]]
-      csv_line = student_data.join(",")
-      file.puts csv_line
+      file << [student[:name], student[:cohort], student[:country], student[:height]]
     end
   end
 end
@@ -113,11 +108,24 @@ def show_students
   print_footer
 end
 
+def clear_students_list(confirm)
+  if @students.empty?
+    puts "There is nothing to delete"
+  elsif confirm == "YES"
+    n = @students.count
+    @students = []  # deletes the current students
+    puts "#{n} students deleted"
+  else
+    puts "Cancelled, nothing was deleted"
+  end
+end
+
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
   puts "3. Save the list"
   puts "4. Load the list"
+  puts "5. Clear the list"
   puts "9. Exit"  
 end
 
@@ -135,6 +143,10 @@ def process(selection)
       puts "What file would you like to load?"
       try_load_students(valid_filename)
       puts "Successfully loaded students"
+    when "5"
+      puts "Are you sure you want to clear the current student list? This will not delete any files"
+      puts "Type \'YES\' to confirm, enter to cancel"
+      clear_students_list(gets.chomp)
     when "9"
       exit
     else
