@@ -39,11 +39,11 @@ def try_load_students(filename)
 end
 
 def load_students(filename = "students.csv") # default filename if no argument supplied
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    add_students(line.chomp.split(','))
+  File.open(filename, "r") do |file|
+    file.readlines.each do |line|
+      add_students(line.chomp.split(','))
+    end
   end
-  file.close
 end
 
 def input_students
@@ -62,13 +62,13 @@ end
 
 def save_students
   puts "Enter a name for your file"
-  file = File.open(valid_filename, "w")
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort], student[:country], student[:height]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  File.open(valid_filename, "w") do |file|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort], student[:country], student[:height]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
   end
-  file.close
 end
 
 def print_header
