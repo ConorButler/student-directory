@@ -15,8 +15,20 @@ def add_students(data)
   @students << {name: name, cohort: cohort, country: country, height: height}
 end
 
-def try_load_students
-  ARGV.first.nil? ? filename = "students.csv" : filename = ARGV.first
+def valid_filename
+  puts "Enter a name for your file"
+  loop do
+    string = STDIN.gets.strip
+    if string.match?(/^\w+\.csv$/)
+      return string
+    elsif string.match?(/^\w+$/)
+      return "#{string}.csv"
+    end
+    puts "Please enter a valid filename"
+  end
+end
+
+def try_load_students(filename)
   if File.exists?(filename) # if a file with this name exists
     load_students(filename) # load this file (and convert to hashes stored in @students)
     puts "Loaded #{@students.count} from #{filename}"
@@ -49,7 +61,7 @@ def input_students
 end
 
 def save_students
-  file = File.open("students.csv", "w")
+  file = File.open(valid_filename, "w")
   @students.each do |student|
     student_data = [student[:name], student[:cohort], student[:country], student[:height]]
     csv_line = student_data.join(",")
@@ -102,8 +114,8 @@ end
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
-  puts "3. Save the list to students.csv"
-  puts "4. Load the list from students.csv"
+  puts "3. Save the list"
+  puts "4. Load the list"
   puts "9. Exit"  
 end
 
@@ -111,12 +123,15 @@ def process(selection)
   case selection
     when "1"
       input_students
+      puts "Successfully added students"
     when "2"
       show_students
     when "3"
       save_students
+      puts "Successfully saved students"
     when "4"
-      load_students
+      try_load_students(valid_filename)
+      puts "Successfully loaded students"
     when "9"
       exit
     else
@@ -131,6 +146,6 @@ def interactive_menu
   end
 end
 
-# calling the menu
-try_load_students
-interactive_menu
+# loading any arguments provided in the command line, then students.csv by default
+ARGV.first.nil? ? try_load_students("students.csv") : try_load_students(ARGV.first)
+interactive_menu  # calling the menu
