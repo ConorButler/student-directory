@@ -65,25 +65,15 @@ def print_header
 end
 
 # printing each student
-def print_students_list
+def print_students_list(selected_cohort, letter)
   index = 0
-  if @students == nil
-    return nil
-  else
-    puts "Enter the cohort you wish to print. Type enter to print all cohorts"
-    cohort = STDIN.gets.strip.capitalize
-    selected_cohort = @students.select{|student| student if student[:cohort] == cohort || cohort.empty?}
-    puts "Print names beginning with which letter? Type enter to print all names"
-    letter = STDIN.gets.strip.upcase
-    print_header  # moved inside the print so it formats correctly
-    until index == selected_cohort.length do
-      if (selected_cohort[index][:name][0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
-        puts "#{index + 1}." + "#{selected_cohort[index][:name]} (#{selected_cohort[index][:cohort]} cohort)".center(28)
-        puts "Country: #{selected_cohort[index][:country]}".center(30)
-        puts "Height: #{selected_cohort[index][:height]}".center(30)
-      end
-      index += 1
+  until index == selected_cohort.length do
+    if (selected_cohort[index][:name][0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
+      puts "#{index + 1}." + "#{selected_cohort[index][:name]} (#{selected_cohort[index][:cohort]} cohort)".center(28)
+      puts "Country: #{selected_cohort[index][:country]}".center(30)
+      puts "Height: #{selected_cohort[index][:height]}".center(30)
     end
+    index += 1
   end
 end
 
@@ -108,7 +98,13 @@ def print_menu
 end
 
 def show_students
-  print_students_list  # print_header is inside print
+  puts "Enter the cohort you wish to print. Type enter to print all cohorts"
+  cohort = STDIN.gets.strip.capitalize
+  selected_cohort = @students.select{|student| student if student[:cohort] == cohort || cohort.empty?}
+  puts "Print names beginning with which letter? Type enter to print all names"
+  letter = STDIN.gets.strip.upcase
+  print_header
+  print_students_list(selected_cohort, letter) if !@students.empty?
   print_footer
 end
 
