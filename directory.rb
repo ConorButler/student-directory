@@ -16,7 +16,6 @@ def add_students(data)
 end
 
 def valid_filename
-  puts "Enter a name for your file"
   loop do
     string = STDIN.gets.strip
     if string.match?(/^\w+\.csv$/)
@@ -30,6 +29,7 @@ end
 
 def try_load_students(filename)
   if File.exists?(filename) # if a file with this name exists
+    @students = []  # deletes the current students
     load_students(filename) # load this file (and convert to hashes stored in @students)
     puts "Loaded #{@students.count} from #{filename}"
   else # if it doesn't exist
@@ -61,6 +61,7 @@ def input_students
 end
 
 def save_students
+  puts "Enter a name for your file"
   file = File.open(valid_filename, "w")
   @students.each do |student|
     student_data = [student[:name], student[:cohort], student[:country], student[:height]]
@@ -130,6 +131,7 @@ def process(selection)
       save_students
       puts "Successfully saved students"
     when "4"
+      puts "What file would you like to load?"
       try_load_students(valid_filename)
       puts "Successfully loaded students"
     when "9"
