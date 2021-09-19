@@ -1,39 +1,32 @@
-@students = [] # an empty array accessible to all methods
+@students = []
+months = ["January", "February", "March", "April", "May", "June",
+"July", "August", "September", "October", "November", "December"]
+# this will be joined with the .union method to create a month regexp
+# months could be removed from this list if they are full
+@input = [
+{:field => :name, :prompt => "Enter the name of the student", :requirement => /^[a-zA-Z]+$/},
+{:field => :cohort, :prompt => "Enter their cohort", :requirement => Regexp.union(months)},
+{:field => :country, :prompt => "Enter the country they are from", :requirement => /^\w+$/},
+{:field => :height, :prompt => "Enter their height in cm e.g. 160cm", :requirement => /^\d+cm$/}
+]
+
 def input_students
-  # an empty input will break the loop below
-  i = 0
-  while i >= 0
-    puts "Please enter the name of the student. Enter 'stop' to stop entering students"
-    name = STDIN.gets.strip
-    if name == "stop"
-      break
+  data = []
+  @input.each do |field|
+    puts field[:prompt]
+    user_input = STDIN.gets.strip.capitalize
+    until user_input.match?(field[:requirement])
+      puts "Error, please enter a valid #{field[:field]}"
+      user_input = STDIN.gets.strip.capitalize
     end
-    @students << {name: name.capitalize} # << means .push/.append
-    puts "Enter their cohort"
-    cohort = STDIN.gets.strip
-    until !cohort.empty?
-      puts "Please enter something"
-      cohort = STDIN.gets.strip
-    end
-    @students[i][:cohort] = cohort.capitalize # standardising the input
-    puts "Enter the country they are from"
-    country = STDIN.gets.strip
-    until !country.empty?
-      puts "Please enter something"
-      country = STDIN.gets.strip
-    end
-    @students[i][:country] = country.capitalize
-    puts "Enter their height in cm"
-    height = STDIN.gets.strip
-    until height.match(/^\d+$/) # making sure they only enter digits
-      puts "Please enter a number"
-      height = STDIN.gets.strip
-    end
-    @students[i][:height] = "#{height} cm"
-    puts "Now we have #{@students.count} students"
-    i += 1
+    data << user_input
   end
-  # no longer needs to return students
+  add_students(data)
+end
+
+def add_students(data)
+  name, cohort, country, height = data
+  @students << {name: name, cohort: cohort, country: country, height: height}
 end
 
 def save_students
@@ -61,8 +54,7 @@ end
 def load_students(filename = "students.csv") # default filename if no argument supplied
   file = File.open(filename, "r")
   file.readlines.each do |line|
-  name, cohort, country, height = line.chomp.split(',')
-    @students << {name: name, cohort: cohort, country: country, height: height}
+    add_students(line.chomp.split(','))
   end
   file.close
 end
@@ -86,8 +78,7 @@ def print_students_list
     print_header  # moved inside the print so it formats correctly
     until index == selected_cohort.length do
       if (selected_cohort[index][:name][0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
-        print "#{index + 1}."
-        puts "#{selected_cohort[index][:name]} (#{selected_cohort[index][:cohort]} cohort)".center(28)
+        puts "#{index + 1}." + "#{selected_cohort[index][:name]} (#{selected_cohort[index][:cohort]} cohort)".center(28)
         puts "Country: #{selected_cohort[index][:country]}".center(30)
         puts "Height: #{selected_cohort[index][:height]}".center(30)
       end
@@ -99,7 +90,7 @@ end
 # printing the total number of students
 def print_footer
   puts "------------------------------"
-  if @students == nil
+  if @students.empty?
     puts "No students to print"
   elsif @students.length == 1
     puts "Overall, we have 1 great student"
