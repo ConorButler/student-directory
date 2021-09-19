@@ -5,30 +5,30 @@ def input_students
   
   while i >= 0
     puts "Please enter the name of the student. Enter 'stop' to stop entering students"
-    name = gets.chomp
+    name = gets.strip
     if name == "stop"
       break
     end
     students << {name: name.capitalize} # << means .push/.append
     puts "Enter their cohort"
-    cohort = gets.chomp
+    cohort = gets.strip
     until !cohort.empty?
       puts "Please enter something"
-      cohort = gets.chomp
+      cohort = gets.strip
     end
     students[i][:cohort] = cohort.capitalize # standardising the input
     puts "Enter the country they are from"
-    country = gets.chomp
+    country = gets.strip
     until !country.empty?
       puts "Please enter something"
-      country = gets.chomp
+      country = gets.strip
     end
     students[i][:country] = country.capitalize
     puts "Enter their height in cm"
-    height = gets.chomp
+    height = gets.strip
     until height.match(/^\d+$/) # making sure they only enter digits
       puts "Please enter a number"
-      height = gets.chomp
+      height = gets.strip
     end
     students[i][:height] = "#{height} cm"
     puts "Now we have #{students.count} students"
@@ -50,12 +50,13 @@ def print(students)
     return nil
   else
     puts "Enter the cohort you wish to print"
-    cohort = gets.chomp.capitalize
+    cohort = gets.strip.capitalize
     selected_cohort = students.select{|student| student if student[:cohort] == cohort}
     puts "Print student names beginning with which letter? Type enter to print all students"
-    letter = gets.chomp.upcase
+    letter = gets.strip.upcase
+    print_header  # moved inside the print so it formats correctly
     until index == selected_cohort.length do
-      if (selected_cohort[index][:name].upcase[0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
+      if (selected_cohort[index][:name][0] == letter || letter.empty?) && selected_cohort[index][:name].length < 12
         puts "#{index + 1}."
         puts "#{selected_cohort[index][:name]} (#{selected_cohort[index][:cohort]} cohort)".center(30)
         puts "Country: #{selected_cohort[index][:country]}".center(30)
@@ -79,6 +80,5 @@ end
 
 # calling the methods
 students = input_students
-print_header
 print(students)
 print_footer(students)
