@@ -36,6 +36,16 @@ def input_students
   # no longer needs to return students
 end
 
+def save_students
+  file = File.open("students.csv", "w")
+  @students.each do |student|
+    student_data = [student[:name], student[:cohort], student[:country], student[:height]]
+    csv_line = student_data.join(",")
+    file.puts csv_line
+  end
+  file.close
+end
+
 def print_header
   puts "The students of Villains Academy"
   puts "------------------------------"
@@ -47,10 +57,10 @@ def print_students_list
   if @students == nil
     return nil
   else
-    puts "Enter the cohort you wish to print"
+    puts "Enter the cohort you wish to print. Type enter to print all cohorts"
     cohort = gets.strip.capitalize
-    selected_cohort = @students.select{|student| student if student[:cohort] == cohort}
-    puts "Print student names beginning with which letter? Type enter to print all students"
+    selected_cohort = @students.select{|student| student if student[:cohort] == cohort || cohort.empty?}
+    puts "Print names beginning with which letter? Type enter to print all names"
     letter = gets.strip.upcase
     print_header  # moved inside the print so it formats correctly
     until index == selected_cohort.length do
@@ -80,6 +90,7 @@ end
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
+  puts "3. Save the list to students.csv"
   puts "9. Exit"  
 end
 
@@ -94,6 +105,8 @@ def process(selection)
       input_students
     when "2"
       show_students
+    when "3"
+      save_students
     when "9"
       exit
     else
